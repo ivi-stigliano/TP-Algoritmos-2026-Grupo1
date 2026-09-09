@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define MAX_DIAS 7 // tope de dias por semana
+const int MAX_DIAS = 7; // tope de dias por semana
 
 // registro de venta, igual al usado por ventas.cpp
 struct Comanda {
