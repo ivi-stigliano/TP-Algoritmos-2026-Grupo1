@@ -28,13 +28,56 @@ struct Comanda {
     float comision;
 };
 
+void encriptarClave(char clave[]) {
+    for (int i = 0; clave[i] != '\0'; i++) {
+        clave[i] = clave[i] + K;
+    }
+}
+
+bool validarMozo(int idMozo, char clave[]) {
+    FILE* archivo = fopen("mozos.dat", "rb");
+
+    if (archivo == NULL) {
+        return false;
+    }
+
+    encriptarClave(clave);
+
+    Mozo mozo;
+
+    while (fread(&mozo, sizeof(Mozo), 1, archivo) == 1) {
+        if (mozo.idMozo == idMozo) {
+            bool coincide = strcmp(mozo.password, clave) == 0;
+
+            fclose(archivo);
+            return coincide;
+        }
+    }
+
+    fclose(archivo);
+    return false;
+}
+
 int main() {
     char fecha[11];
 
     cout << "Ingrese la fecha (DD-MM-AAAA): ";
     cin >> fecha;
 
-    cout << "Fecha seleccionada: " << fecha << endl;
+    int idMozo;
+    char clave[20];
+
+    cout << "Ingrese ID del mozo: ";
+    cin >> idMozo;
+
+    cout << "Ingrese clave: ";
+    cin >> clave;
+
+    if (validarMozo(idMozo, clave)) {
+        cout << "Mozo validado correctamente." << endl;
+    } else {
+        cout << "Mozo o clave incorrectos." << endl;
+    }
 
     return 0;
 }
