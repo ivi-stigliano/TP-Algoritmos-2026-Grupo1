@@ -36,10 +36,14 @@ const float TASA_COMISION = 0.10f;
 
 void ordenamientoPorFecha(const char* nombreArchivo);
 void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2);
+void ordenamientoPorCodigo(const char* nombreArchivo);
+void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2);
 
 int main(){
 	ordenamientoPorFecha("comandas_historicas.dat");
 	comandasPorDia("comandas_historicas.dat","mozos.dat");
+	ordenamientoPorCodigo("comandas_historicas.dat");
+	actualizacionDeStock("comandas_historicas.dat","inventario.dat");
 }
 
 void ordenamientoPorFecha(const char* nombreArchivo){
@@ -118,5 +122,66 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 		fclose(comandas);
 	}
 	fclose(mozos);
+	fclose(archivo);
+}
+
+void ordenamientoPorCodigo(const char* nombreArchivo){
+	int len=0;
+	ComandaHistorica ch;
+	FILE*archivo=fopen(nombreArchivo,"rb+");
+	if(archivo==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	while(fread(&ch,sizeof(ComandaHistorica),1,archivo)==1){
+		len++;
+	}
+	for(int i=0;i<(len-1);i++){
+		for(int j=0;j<(len-i-1);j++){
+		    ComandaHistorica ch1, ch2, temp;
+	    	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&ch1,sizeof(ComandaHistorica),1,archivo);
+            fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&ch2,sizeof(ComandaHistorica),1,archivo); 
+            if(ch1.codigoProducto>ch2.codigoProducto){
+                temp=ch1;
+                ch1=ch2;
+        		ch2=temp;
+            	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
+            	fwrite(&ch1,sizeof(ComandaHistorica),1,archivo);   
+            	fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            	fwrite(&ch2,sizeof(ComandaHistorica),1,archivo);
+            }
+	    }
+	}
+	fclose(archivo);
+}
+
+void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2){
+	ComandaHistorica ch;
+	Producto p;
+	FILE*archivo=fopen(nombreArchivo1,"rb");
+	if(archivo==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	FILE*inventario=fopen(nombreArchivo2,"rb+");
+	if(inventario==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
+	while(leido==1){
+		fseek(inventario,0,SEEK_CUR);
+		p.codigo=ch.codigoProducto;
+		while(leido==1 && p.codigo==ch.codigoProducto){
+			p.stockActual-=ch.cantidad;
+			fseek(inventario,-sizeof(Producto),SEEK_CUR);
+			fwrite(&p,sizeof(Producto),1,inventario);
+			break;
+		}
+		leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
+	}
+	fclose(inventario);
 	fclose(archivo);
 }
