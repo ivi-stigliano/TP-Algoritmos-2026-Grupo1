@@ -174,13 +174,14 @@ void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2
 	}
 	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
 	while(leido==1){
-		fseek(inventario,0,SEEK_CUR);
-		p.codigo=ch.codigoProducto;
-		while(leido==1 && p.codigo==ch.codigoProducto){
-			p.stockActual-=ch.cantidad;
-			fseek(inventario,-sizeof(Producto),SEEK_CUR);
-			fwrite(&p,sizeof(Producto),1,inventario);
-			break;
+		fseek(inventario,0,SEEK_SET);
+		while(fread(&p,sizeof(Producto),1,inventario)==1){
+			if(p.codigo==ch.codigoProducto){
+				p.stockActual-=ch.cantidad;
+				fseek(inventario,-sizeof(Producto),SEEK_CUR);
+				fwrite(&p,sizeof(Producto),1,inventario);
+				break;
+			}
 		}
 		leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
 	}
