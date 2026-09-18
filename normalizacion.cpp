@@ -90,6 +90,7 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 	FILE*mozos=fopen(nombreArchivo2,"rb");
 	if(mozos==NULL){
 		cout<<"No se pudo abrir el archivo"<<endl;
+		fclose(archivo);
 		return;
 	}
 	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
@@ -168,6 +169,7 @@ void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2
 	FILE*inventario=fopen(nombreArchivo2,"rb+");
 	if(inventario==NULL){
 		cout<<"No se pudo abrir el archivo"<<endl;
+		fclose(archivo);
 		return;
 	}
 	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
