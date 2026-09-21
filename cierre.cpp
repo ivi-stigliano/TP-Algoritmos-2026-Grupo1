@@ -27,8 +27,11 @@ void sumarUnDia(int &dia, int &mes, int &anio) {
     if (dia > diasDelMes(mes, anio)) {
         dia = 1;
         mes++;
-        if (mes > 12) { mes = 1; anio++; }
+        if (mes > 12){ 
+            mes = 1; 
+            anio++; }
     }
+    
 }
 
 int main() {
@@ -45,7 +48,7 @@ int main() {
     cout << "Mes de la semana (para el nombre del archivo): ";
     cin >> mesSemana;
 
-    if (cantidadDias > MAX_DIAS) cantidadDias = MAX_DIAS; // por las dudas, no pasar el tope
+    if (cantidadDias > MAX_DIAS) cantidadDias = MAX_DIAS; //no pasar el tope
 
     // un FILE*, un candidato (proximo registro a comparar) y su validez, por cada dia
     FILE* archivos[MAX_DIAS];
@@ -55,19 +58,24 @@ int main() {
     int dia = diaIni, mes = mesIni, anio = anioIni;
 
     // abre cada archivo del rango y carga su primer registro (si el archivo existe)
-    for (int i = 0; i < cantidadDias; i++) {
+   for (int i = 0; i < cantidadDias; i++) {
+
         char nombre[40];
         sprintf(nombre, "comandas_%02d-%02d-%04d.dat", dia, mes, anio);
-
         archivos[i] = fopen(nombre, "rb");
+
         if (archivos[i] != NULL) {
             valido[i] = (fread(&candidato[i], sizeof(Comanda), 1, archivos[i]) == 1);
+            if (!valido[i]) fclose(archivos[i]); // se abrio pero estaba vacio: no aporta nada
+
         } else {
             valido[i] = false; // ese dia no se trabajo y no genero archivo: no participa del merge
         }
 
         sumarUnDia(dia, mes, anio); // paso a la fecha siguiente para la proxima vuelta
     }
+
+
 
     // preguntar mozo x mozo (siguiente parte)
 
