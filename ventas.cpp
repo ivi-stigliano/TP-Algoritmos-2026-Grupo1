@@ -130,65 +130,109 @@ bool actualizarStock(long posicion, int cantidad) {
     return true;
 }
 
+bool actualizarComisionMozo(int idMozo, float comision) {
+    FILE* archivo = fopen("mozos.dat", "rb+");
+
+    if (archivo == NULL) {
+        return false;
+    }
+
+    Mozo mozo;
+
+    while (fread(&mozo, sizeof(Mozo), 1, archivo) == 1) {
+        if (mozo.idMozo == idMozo) {
+
+            mozo.totalComision += comision;
+
+            fseek(archivo, -(long)sizeof(Mozo), SEEK_CUR);
+
+            fwrite(&mozo, sizeof(Mozo), 1, archivo);
+
+            fclose(archivo);
+            return true;
+        }
+    }
+
+    fclose(archivo);
+    return false;
+}
+
 int main() {
     char fecha[11], clave[20];
+    char continuar;
     int idMozo, codigoProducto, cantidad;
 
     cout << "Fecha (DD-MM-AAAA): ";
     cin >> fecha;
 
-    cout << "ID del mozo: ";
-    cin >> idMozo;
+    do {
+        cout << "ID del mozo: ";
+        cin >> idMozo;
 
-    cout << "Clave: ";
-    cin >> clave;
+        cout << "Clave: ";
+        cin >> clave;
 
-    if (!validarMozo(idMozo, clave)) {
-        cout << "Mozo o clave incorrectos." << endl;
-        return 0;
-    }
-
-    cout << "Codigo del producto: ";
-    cin >> codigoProducto;
-
-    Producto producto;
-    long posicion;
-
-    if (buscarProducto(codigoProducto, producto, posicion)) {
-        cout << "Producto: " << producto.descripcion << endl;
-        cout << "Precio: $" << producto.precio << endl;
-        cout << "Stock actual: " << producto.stockActual << endl;
-        cout << "Cantidad: ";
-        cin >> cantidad;
-
-        if (cantidad > 0 && actualizarStock(posicion, cantidad)) {
-            float comision = producto.precio * cantidad * TASA_COMISION;
-            Comanda comanda;
-            comanda.idMozo = idMozo;
-            comanda.codigoProducto = codigoProducto;
-            comanda.cantidad = cantidad;
-            comanda.comision = comision;
-            
-            char nombreArchivo[40];
-            strcpy(nombreArchivo, "comandas_");
-            strcat(nombreArchivo, fecha);
-            strcat(nombreArchivo, ".dat");
-            
-            FILE* archivo = fopen(nombreArchivo, "ab");
-
-            if (archivo == NULL) {
-                cout << "No se pudo abrir la planilla del dia." << endl;
-                return 0;
-            }
-            fwrite(&comanda, sizeof(Comanda), 1, archivo);
-            fclose(archivo);
-            cout << "Venta registrada correctamente." << endl;
-            cout << "Comision: $" << comision << endl;
+        if (!validarMozo(idMozo, clave)) {
+            cout << "Mozo o clave incorrectos." << endl;
         } else {
-            cout << "No hay suficiente stock o la cantidad es invalida." << endl;
+            cout << "Codigo del producto: ";
+            cin >> codigoProducto;
+
+            Producto producto;
+            long posicion;
+
+            if (buscarProducto(codigoProducto, producto, posicion)) {
+                cout << "Producto: " << producto.descripcion << endl;
+                cout << "Precio: $" << producto.precio << endl;
+                cout << "Stock actual: " << producto.stockActual << endl;
+
+                cout << "Cantidad: ";
+                cin >> cantidad;
+
+                if (cantidad > 0 && actualizarStock(posicion, cantidad)) {
+
+                    float comision = producto.precio * cantidad * TASA_COMISION;
+
+                    Comanda comanda;
+                    comanda.idMozo = idMozo;
+                    comanda.codigoProducto = codigoProducto;
+                    comanda.cantidad = cantidad;
+                    comanda.comision = comision;
+
+                    char nombreArchivo[40];
+                    strcpy(nombreArchivo, "comandas_");
+                    strcat(nombreArchivo, fecha);
+                    strcat(nombreArchivo, ".dat");
+
+                    FILE* archivo = fopen(nombreArchivo, "ab");
+
+                    if (archivo == NULL) {
+                        cout << "No se pudo abrir la planilla del dia." << endl;
+                    } else {
+                        fwrite(&comanda, sizeof(Comanda), 1, archivo);
+                        fclose(archivo);
+
+                        if (!actualizarComisionMozo(idMozo, comision)) {
+                            cout << "No se pudo actualizar la comision del mozo." << endl;
+                        } else {
+                            cout << "Venta registrada correctamente." << endl;
+                            cout << "Comision: $" << comision << endl;
+                        }
+                    }
+
+                } else {
+                    cout << "No hay suficiente stock o la cantidad es invalida." << endl;
+                }
+
+            } else {
+                cout << "El producto no existe." << endl;
+            }
         }
-    } else {
-        cout << "El producto no existe." << endl;
-    }
+
+        cout << "Quiere cargar otra venta? (S/N): ";
+        cin >> continuar;
+
+    } while (continuar == 'S' || continuar == 's');
+
     return 0;
 }
