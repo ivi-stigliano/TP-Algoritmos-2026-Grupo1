@@ -28,7 +28,7 @@ int diasDelMes(int mes, int anio) {
 }
 
 // avanza la fecha (dia, mes, anio) un dia, pasando de mes/anio si corresponde
-void sumarUnDia(int &dia, int &mes, int &anio) {
+void siguienteDia(int &dia, int &mes, int &anio) {
     dia++;
     if (dia > diasDelMes(mes, anio)) {
         dia = 1;
@@ -40,14 +40,14 @@ void sumarUnDia(int &dia, int &mes, int &anio) {
     }
 }
 
-int escribirTexto(char destino[], int pos, const char texto[]) {
-    int i = 0;
-    while (texto[i] != '\0') {
-        destino[pos] = texto[i];
-        pos++;
-        i++;
+// Ej: valor = 6, cifras = 2 -> "06"
+
+int escribirNumero(char destino[], int pos, int valor, int cifras) {
+    for (int i = cifras - 1; i >= 0; i--) {
+        destino[pos + i] = '0' + valor % 10;   // ultima cifra como caracter
+        valor = valor / 10;                    // me quedo con el resto de cifras
     }
-    return pos;
+    return pos + cifras;
 }
  
 // "comandas_dd-mm-aaaa.dat"
@@ -78,8 +78,7 @@ void armarNombreSemana(char nombre[], int semana, int mes) {
     nombre[pos] = '\0';
 }
 
-bool pedirDatos(int &dia, int &mes, int &anio, int &cantidadDias,
-                int &semana, int &mesSemana) {
+bool pedirDatos(int &dia, int &mes, int &anio, int &cantidadDias, int &semana, int &mesSemana) {
 
     cout << "Fecha del primer dia de la semana" << endl;
     cout << "  Dia: ";
@@ -105,11 +104,72 @@ bool pedirDatos(int &dia, int &mes, int &anio, int &cantidadDias,
     }
     return true;
 }
- 
+ //lee el siguiente registro de un archivo, devuelve true si lee, false si se termino
+
 bool leerComanda(FILE *archivo, Comanda &comanda) {
     return fread(&comanda, sizeof(Comanda), 1, archivo) == 1;
 }
 
+int abrirPlanillas(FILE *dias[], Comanda actual[], bool hay[],
+                   int cantidadDias, int dia, int mes, int anio) {
+    int abiertos = 0;
+    char nombre[40];
+ 
+    for (int i = 0; i < cantidadDias; i++) {
+        armarNombreDia(nombre, dia, mes, anio);
+ 
+        dias[i] = fopen(nombre, "rb");
+        hay[i] = false;
+ 
+        if (dias[i] == NULL) {
+            cout << "Sin planilla para " << nombre << " (se saltea)" << endl;
+
+        } else {
+            abiertos++;
+            // si el archivo esta vacio, hay[i] queda en false
+            hay[i] = leerComanda(dias[i], actual[i]);
+        }
+ 
+        siguienteDia(dia, mes, anio);
+    }
+
+    return abiertos;
+}
+
+int indiceMenor(Comanda actual[], bool hay[], int cantidad) {
+    int menor = -1;
+    for (int i = 0; i < cantidad; i++) {
+        if (hay[i]) {
+            if (menor == -1 || actual[i].idMozo < actual[menor].idMozo) {
+                menor = i;
+            }
+        }
+    }
+    return menor;
+}
+
+int mezclar(FILE *dias[], Comanda actual[], bool hay[],
+            int cantidadDias, FILE *salida) {
+    int total = 0;
+    int i = indiceMenor(actual, hay, cantidadDias);
+ 
+    while (i != -1) {
+        fwrite(&actual[i], sizeof(Comanda), 1, salida);
+        total++;
+        hay[i] = leerComanda(dias[i], actual[i]);
+        i = indiceMenor(actual, hay, cantidadDias);
+    }
+    return total;
+}
+
+
+void cerrarPlanillas(FILE *dias[], int cantidadDias) {
+    for (int i = 0; i < cantidadDias; i++) {
+        if (dias[i] != NULL) {
+            fclose(dias[i]);
+        }
+    }
+}
 
 int main() {
     int dia, mes, anio;
