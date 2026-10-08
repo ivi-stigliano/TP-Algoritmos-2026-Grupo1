@@ -64,6 +64,44 @@ void ordenamientoPorMozo(const char* nombreArchivo){
 	fclose(archivo);
 }
 
+void listaDeMozos(const char* nombreArchivo){
+	ComandaHistorica ch;
+	Mozo m;
+	int idMozo=1;
+	FILE*archivo=fopen(nombreArchivo,"rb");
+	if(archivo==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	FILE*mozos=fopen("mozos.dat","wb");
+	if(mozos==NULL){
+		cout<<"No se pudo crear el archivo"<<endl;
+		return;
+	}
+	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
+	while(leido==1){
+		m.totalComision=0;
+		char nombreGuia[50], password[20];
+		strcpy(nombreGuia,ch.nombreMozo);
+		strcpy(m.nombre,nombreGuia);
+		cout<<"Ingrese una contrasenia para el mozo "<<ch.nombreMozo<<" (no mas de 20 caracteres):"<<endl; // Asignación de contraseña por mozo
+		cin.getline(password,20);
+		for(int p=0;password[p]!='\0';p++){
+			password[p]+=3;
+		}
+		strcpy(m.password,password);
+		while(leido==1 && strcmp(nombreGuia,ch.nombreMozo)==0){
+			m.totalComision+=ch.comision;
+			leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
+		}
+		m.idMozo=idMozo;
+		fwrite(&m,sizeof(Mozo),1,mozos);
+		idMozo++;
+	}
+	fclose(mozos);
+	fclose(archivo);
+}
+
 void ordenamientoPorFecha(const char* nombreArchivo);
 void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2);
 void ordenamientoPorCodigo(const char* nombreArchivo);
