@@ -32,7 +32,37 @@ struct Comanda{
 	float comision;
 };
 
-const float TASA_COMISION = 0.10f;
+void ordenamientoPorMozo(const char* nombreArchivo){
+	int len=0;
+	ComandaHistorica ch;
+	FILE*archivo=fopen(nombreArchivo,"rb+");
+	if(archivo==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	while(fread(&ch,sizeof(ComandaHistorica),1,archivo)==1){
+		len++;
+	}
+	for(int i=0;i<(len-1);i++){
+		for(int j=0;j<(len-i-1);j++){
+		    ComandaHistorica ch1, ch2, temp;
+	    	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&ch1,sizeof(ComandaHistorica),1,archivo);
+            fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&ch2,sizeof(ComandaHistorica),1,archivo);
+            if(strcmp(ch1.nombreMozo,ch2.nombreMozo)>0){
+                temp=ch1;
+                ch1=ch2;
+        		ch2=temp;
+            	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
+            	fwrite(&ch1,sizeof(ComandaHistorica),1,archivo);   
+            	fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            	fwrite(&ch2,sizeof(ComandaHistorica),1,archivo);
+            }
+	    }
+	}
+	fclose(archivo);
+}
 
 void ordenamientoPorFecha(const char* nombreArchivo);
 void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2);
@@ -59,7 +89,7 @@ void ordenamientoPorFecha(const char* nombreArchivo){
 	}
 	for(int i=0;i<(len-1);i++){
 		for(int j=0;j<(len-i-1);j++){
-		    ComandaHistorica ch1, ch2, temp; // Se inicializan los valores de ch1 y ch2 para la comparación
+		    ComandaHistorica ch1, ch2, temp; // Se inicializan los valores de ch1 y ch2 para la comparaciÃ³n
 	    	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
             fread(&ch1,sizeof(ComandaHistorica),1,archivo);
             fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
@@ -95,7 +125,7 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 	}
 	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
 	while(leido==1){
-		char fechaGuia[11]; // Se crea cada archivo de las comandas por día
+		char fechaGuia[11]; // Se crea cada archivo de las comandas por dÃ­a
 		strcpy(fechaGuia,ch.fecha);
 		char archivoActual[24]="comandas_";
 		strcat(archivoActual,fechaGuia);
