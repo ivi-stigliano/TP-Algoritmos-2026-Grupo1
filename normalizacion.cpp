@@ -32,36 +32,16 @@ struct Comanda{
 	float comision;
 };
 
-void ordenamientoPorMozo(const char* nombreArchivo){
-	int len=0;
-	ComandaHistorica ch;
-	FILE*archivo=fopen(nombreArchivo,"rb+");
-	if(archivo==NULL){
-		cout<<"No se pudo abrir el archivo"<<endl;
-		return;
-	}
-	while(fread(&ch,sizeof(ComandaHistorica),1,archivo)==1){
-		len++;
-	}
-	for(int i=0;i<(len-1);i++){
-		for(int j=0;j<(len-i-1);j++){
-		    ComandaHistorica ch1, ch2, temp;
-	    	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
-            fread(&ch1,sizeof(ComandaHistorica),1,archivo);
-            fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
-            fread(&ch2,sizeof(ComandaHistorica),1,archivo);
-            if(strcmp(ch1.nombreMozo,ch2.nombreMozo)>0){
-                temp=ch1;
-                ch1=ch2;
-        		ch2=temp;
-            	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
-            	fwrite(&ch1,sizeof(ComandaHistorica),1,archivo);   
-            	fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
-            	fwrite(&ch2,sizeof(ComandaHistorica),1,archivo);
-            }
-	    }
-	}
-	fclose(archivo);
+void ordenamientoPorFecha(const char* nombreArchivo);
+void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2);
+void ordenamientoPorCodigo(const char* nombreArchivo);
+void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2);
+
+int main(){
+	ordenamientoPorFecha("comandas_historicas.dat");
+	comandasPorDia("comandas_historicas.dat","mozos.dat");
+	ordenamientoPorCodigo("comandas_historicas.dat");
+	actualizacionDeStock("comandas_historicas.dat","inventario.dat");
 }
 
 void listaDeMozos(const char* nombreArchivo){
@@ -102,16 +82,36 @@ void listaDeMozos(const char* nombreArchivo){
 	fclose(archivo);
 }
 
-void ordenamientoPorFecha(const char* nombreArchivo);
-void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2);
-void ordenamientoPorCodigo(const char* nombreArchivo);
-void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2);
-
-int main(){
-	ordenamientoPorFecha("comandas_historicas.dat");
-	comandasPorDia("comandas_historicas.dat","mozos.dat");
-	ordenamientoPorCodigo("comandas_historicas.dat");
-	actualizacionDeStock("comandas_historicas.dat","inventario.dat");
+void ordenamientoPorMozo(const char* nombreArchivo){
+	int len=0;
+	ComandaHistorica ch;
+	FILE*archivo=fopen(nombreArchivo,"rb+");
+	if(archivo==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	while(fread(&ch,sizeof(ComandaHistorica),1,archivo)==1){
+		len++;
+	}
+	for(int i=0;i<(len-1);i++){
+		for(int j=0;j<(len-i-1);j++){
+		    ComandaHistorica ch1, ch2, temp;
+	    	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&ch1,sizeof(ComandaHistorica),1,archivo);
+            fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&ch2,sizeof(ComandaHistorica),1,archivo);
+            if(strcmp(ch1.nombreMozo,ch2.nombreMozo)>0){
+                temp=ch1;
+                ch1=ch2;
+        		ch2=temp;
+            	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
+            	fwrite(&ch1,sizeof(ComandaHistorica),1,archivo);   
+            	fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            	fwrite(&ch2,sizeof(ComandaHistorica),1,archivo);
+            }
+	    }
+	}
+	fclose(archivo);
 }
 
 void ordenamientoPorFecha(const char* nombreArchivo){
