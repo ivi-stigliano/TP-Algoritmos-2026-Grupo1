@@ -14,96 +14,105 @@ struct Comanda {
     float comision;
 };
 
-bool esBisiesto(int anio) {
-    return (anio % 4 == 0 && anio % 100 != 0) || (anio % 400 == 0);
-}
-
 // cantidad de dias que tiene un mes (considera bisiesto simple)
 int diasDelMes(int mes, int anio) {
     int dias[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (mes == 2 && esBisiesto(anio)) {
-        return 29;
-    }
     return dias[mes - 1];
-}
-
-// avanza la fecha (dia, mes, anio) un dia, pasando de mes/anio si corresponde
-void siguienteDia(int &dia, int &mes, int &anio) {
-    dia++;
-    if (dia > diasDelMes(mes, anio)) {
-        dia = 1;
-        mes++;
-        if (mes > 12){ 
-            mes = 1; 
-            anio++; 
-        }
     }
+
+bool calcularSemana(int mes, int semana, int &diaInicio, int &cantDias) {
+    int totalDias = diasDelMes(mes);
+ 
+    diaInicio = (semana - 1) * MAX_DIAS_SEMANA + 1;
+    if (diaInicio > totalDias) {
+        return false;
+    }
+ 
+    int diaFin = diaInicio + MAX_DIAS_SEMANA - 1;
+    if (diaFin > totalDias) {
+        diaFin = totalDias;
+    }
+ 
+    cantDias = diaFin - diaInicio + 1;
+    return true;
 }
-
-// Ej: valor = 6, cifras = 2 -> "06"
-
-int escribirNumero(char destino[], int pos, int valor, int cifras) {
+ 
+// Ej: valor = 6, cifras = 2 -> "06"g
+void numeroATexto(char destino[], int valor, int cifras) {
     for (int i = cifras - 1; i >= 0; i--) {
-        destino[pos + i] = '0' + valor % 10;   // ultima cifra como caracter
-        valor = valor / 10;                    // me quedo con el resto de cifras
+        destino[i] = '0' + valor % 10;   // ultima cifra como caracter
+        valor = valor / 10;              // me quedo con el resto de cifras
     }
-    return pos + cifras;
+    destino[cifras] = '\0';
 }
  
 // "comandas_dd-mm-aaaa.dat"
 void armarNombreDia(char nombre[], int dia, int mes, int anio) {
-    int pos = 0;
-    pos = escribirTexto(nombre, pos, "comandas_");
-    pos = escribirNumero(nombre, pos, dia, 2);
-    pos = escribirTexto(nombre, pos, "-");
-    pos = escribirNumero(nombre, pos, mes, 2);
-    pos = escribirTexto(nombre, pos, "-");
-    pos = escribirNumero(nombre, pos, anio, 4);
-    pos = escribirTexto(nombre, pos, ".dat");
-    nombre[pos] = '\0';
+    char parte[10];
+ 
+    strcpy(nombre, "comandas_");
+ 
+    numeroATexto(parte, dia, 2);
+    strcat(nombre, parte);
+ 
+    strcat(nombre, "-");
+ 
+    numeroATexto(parte, mes, 2);
+    strcat(nombre, parte);
+ 
+    strcat(nombre, "-");
+ 
+    numeroATexto(parte, anio, 4);
+    strcat(nombre, parte);
+ 
+    strcat(nombre, ".dat");
 }
  
 // "comandas_semana_sX-mm.dat"
 void armarNombreSemana(char nombre[], int semana, int mes) {
-    int pos = 0;
-    pos = escribirTexto(nombre, pos, "comandas_semana_s");
+    char parte[10];
+ 
+    strcpy(nombre, "comandas_semana_s");
+ 
     if (semana < 10) {
-        pos = escribirNumero(nombre, pos, semana, 1);
+        numeroATexto(parte, semana, 1);
     } else {
-        pos = escribirNumero(nombre, pos, semana, 2);
+        numeroATexto(parte, semana, 2);
     }
-    pos = escribirTexto(nombre, pos, "-");
-    pos = escribirNumero(nombre, pos, mes, 2);
-    pos = escribirTexto(nombre, pos, ".dat");
-    nombre[pos] = '\0';
+    strcat(nombre, parte);
+ 
+    strcat(nombre, "-");
+ 
+    numeroATexto(parte, mes, 2);
+    strcat(nombre, parte);
+ 
+    strcat(nombre, ".dat");
 }
 
-bool pedirDatos(int &dia, int &mes, int &anio, int &cantidadDias, int &semana, int &mesSemana) {
-
-    cout << "Fecha del primer dia de la semana" << endl;
-    cout << "  Dia: ";
-    cin >> dia;
-    cout << "  Mes: ";
+bool pedirDatos(int &mes, int &anio, int &semana, int &diaInicio, int &cantDias) {
+    cout << "=== CIERRE SEMANAL ===" << endl;
+    cout << "Mes (1-12): ";
     cin >> mes;
-    cout << "  Anio: ";
+    cout << "Anio: ";
     cin >> anio;
-    cout << "Cantidad de dias a juntar (1 a " << MAX_DIAS << "): ";
-    cin >> cantidadDias;
-    cout << "Numero de semana (X): ";
+    cout << "Numero de semana del mes (1, 2, 3...): ";
     cin >> semana;
-    cout << "Mes para el nombre del archivo (mm): ";
-    cin >> mesSemana;
  
-    if (cantidadDias < 1 || cantidadDias > MAX_DIAS) {
-        cout << "Cantidad de dias invalida." << endl;
+    if (mes < 1 || mes > 12) {
+        cout << "Mes invalido." << endl;
         return false;
     }
-    if (mes < 1 || mes > 12 || dia < 1 || dia > diasDelMes(mes, anio)) {
-        cout << "Fecha invalida." << endl;
+    if (semana < 1) {
+        cout << "Numero de semana invalido." << endl;
+        return false;
+    }
+    if (!calcularSemana(mes, semana, diaInicio, cantDias)) {
+        cout << "Ese mes no tiene semana " << semana << "." << endl;
         return false;
     }
     return true;
 }
+
  //lee el siguiente registro de un archivo, devuelve true si lee, false si se termino
 
 bool leerComanda(FILE *archivo, Comanda &comanda) {
@@ -111,80 +120,77 @@ bool leerComanda(FILE *archivo, Comanda &comanda) {
 }
 
 int abrirPlanillas(FILE *dias[], Comanda actual[], bool hay[],
-                   int cantidadDias, int dia, int mes, int anio) {
+                   int cantDias, int diaInicio, int mes, int anio) {
     int abiertos = 0;
     char nombre[40];
  
-    for (int i = 0; i < cantidadDias; i++) {
-        armarNombreDia(nombre, dia, mes, anio);
+    for (int i = 0; i < cantDias; i++) {
+        int diaActual = diaInicio + i;
+        armarNombreDia(nombre, diaActual, mes, anio);
  
         dias[i] = fopen(nombre, "rb");
         hay[i] = false;
  
         if (dias[i] == NULL) {
             cout << "Sin planilla para " << nombre << " (se saltea)" << endl;
-
         } else {
             abiertos++;
             // si el archivo esta vacio, hay[i] queda en false
             hay[i] = leerComanda(dias[i], actual[i]);
         }
- 
-        siguienteDia(dia, mes, anio);
     }
-
     return abiertos;
 }
 
-int indiceMenor(Comanda actual[], bool hay[], int cantidad) {
-    int menor = -1;
-    for (int i = 0; i < cantidad; i++) {
-        if (hay[i]) {
-            if (menor == -1 || actual[i].idMozo < actual[menor].idMozo) {
-                menor = i;
+int aparear(FILE *dias[], Comanda actual[], bool hay[], int cantDias, FILE *salida) {
+    int totalEscritos = 0;
+    bool quedaAlguno = true;
+ 
+    while (quedaAlguno) {
+        //busco cual de los candidatos actuales es el menor
+        int menor = -1;
+        for (int i = 0; i < cantDias; i++) {
+            if (hay[i]) {
+                if (menor == -1 || actual[i].idMozo < actual[menor].idMozo) {
+                    menor = i;
+                }
             }
         }
-    }
-    return menor;
-}
-
-int mezclar(FILE *dias[], Comanda actual[], bool hay[],
-            int cantidadDias, FILE *salida) {
-    int total = 0;
-    int i = indiceMenor(actual, hay, cantidadDias);
  
-    while (i != -1) {
-        fwrite(&actual[i], sizeof(Comanda), 1, salida);
-        total++;
-        hay[i] = leerComanda(dias[i], actual[i]);
-        i = indiceMenor(actual, hay, cantidadDias);
+        if (menor == -1) {
+            // ningun archivo tiene candidato, termino
+            quedaAlguno = false;
+        } else {
+            // vuelco el menor y avanzo solo en ese archivo
+            fwrite(&actual[menor], sizeof(Comanda), 1, salida);
+            totalEscritos++;
+            hay[menor] = leerComanda(dias[menor], actual[menor]);
+        }
     }
-    return total;
+ 
+    return totalEscritos;
 }
 
-
-void cerrarPlanillas(FILE *dias[], int cantidadDias) {
-    for (int i = 0; i < cantidadDias; i++) {
+void cerrarPlanillas(FILE *dias[], int cantDias) {
+    for (int i = 0; i < cantDias; i++) {
         if (dias[i] != NULL) {
             fclose(dias[i]);
         }
     }
 }
-
 int main() {
-    int dia, mes, anio;
-    int cantidadDias;
-    int semana, mesSemana;
+    int mes, anio, semana;
+    int diaInicio, cantDias;
  
-    if (!pedirDatos(dia, mes, anio, cantidadDias, semana, mesSemana)) {
+    if (!pedirDatos(mes, anio, semana, diaInicio, cantDias)) {
         return 1;
     }
  
-    FILE *dias[MAX_DIAS];       // un archivo por dia
-    Comanda actual[MAX_DIAS];   // registro pendiente de cada archivo
-    bool hay[MAX_DIAS];         // true si actual[i] tiene un registro valido
+    FILE *dias[MAX_DIAS_SEMANA];       // un archivo por dia de la semana
+    Comanda actual[MAX_DIAS_SEMANA];   // registro pendiente de cada archivo
+    bool hay[MAX_DIAS_SEMANA];         // true si actual[i] tiene un registro valido
  
-    int abiertos = abrirPlanillas(dias, actual, hay, cantidadDias, dia, mes, anio);
+    int abiertos = abrirPlanillas(dias, actual, hay, cantDias, diaInicio, mes, anio);
  
     if (abiertos == 0) {
         cout << "No se encontro ninguna planilla diaria. No se genera la semanal." << endl;
@@ -192,18 +198,18 @@ int main() {
     }
  
     char nombreSemana[40];
-    armarNombreSemana(nombreSemana, semana, mesSemana);
+    armarNombreSemana(nombreSemana, semana, mes);
  
     FILE *salida = fopen(nombreSemana, "wb");
     if (salida == NULL) {
         cout << "No se pudo crear " << nombreSemana << endl;
-        cerrarPlanillas(dias, cantidadDias);
+        cerrarPlanillas(dias, cantDias);
         return 1;
     }
  
-    int total = mezclar(dias, actual, hay, cantidadDias, salida);
+    int total = apareo(dias, actual, hay, cantDias, salida);
  
-    cerrarPlanillas(dias, cantidadDias);
+    cerrarPlanillas(dias, cantDias);
     fclose(salida);
  
     cout << "Listo: " << nombreSemana << " generado con " << total
@@ -211,4 +217,3 @@ int main() {
  
     return 0;
 }
- 
