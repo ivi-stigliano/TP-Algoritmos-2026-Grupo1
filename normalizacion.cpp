@@ -61,7 +61,7 @@ void ordenamientoPorMozo(const char* nombreArchivo){
 	}
 	for(int i=0;i<(len-1);i++){
 		for(int j=0;j<(len-i-1);j++){
-		    ComandaHistorica ch1, ch2, temp; // Se inicializan los valores de ch1 y ch2 para la comparación
+		    ComandaHistorica ch1, ch2, temp; // Se inicializan los valores de ch1 y ch2 para la comparacion
 	    	fseek(archivo,j*sizeof(ComandaHistorica),SEEK_SET);
             fread(&ch1,sizeof(ComandaHistorica),1,archivo);
             fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
@@ -81,6 +81,7 @@ void ordenamientoPorMozo(const char* nombreArchivo){
 }
 
 void listaDeMozos(const char* nombreArchivo){
+	cout<<"-- Apertura de mozos.dat --"<<endl;
 	ComandaHistorica ch;
 	Mozo m;
 	int idMozo=1;
@@ -92,6 +93,7 @@ void listaDeMozos(const char* nombreArchivo){
 	FILE*mozos=fopen("mozos.dat","wb");
 	if(mozos==NULL){
 		cout<<"No se pudo crear el archivo"<<endl;
+		fclose(archivo);
 		return;
 	}
 	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
@@ -100,7 +102,7 @@ void listaDeMozos(const char* nombreArchivo){
 		char nombreGuia[50], password[20];
 		strcpy(nombreGuia,ch.nombreMozo);
 		strcpy(m.nombre,nombreGuia);
-		cout<<"Ingrese una contrasenia para el mozo "<<ch.nombreMozo<<" (no mas de 20 caracteres):"<<endl; // Asignación de contraseña por mozo
+		cout<<"Ingrese una contrasenia para el mozo "<<ch.nombreMozo<<" (no mas de 20 caracteres):"<<endl; // Asignacion de contrasenia por mozo
 		cin.getline(password,20);
 		for(int p=0;password[p]!='\0';p++){
 			password[p]+=3;
@@ -114,6 +116,7 @@ void listaDeMozos(const char* nombreArchivo){
 		fwrite(&m,sizeof(Mozo),1,mozos);
 		idMozo++;
 	}
+	cout<<"Archivo mozos.dat creado con exito."<<endl;
 	fclose(mozos);
 	fclose(archivo);
 }
@@ -151,6 +154,7 @@ void ordenamientoPorFecha(const char* nombreArchivo){
 }
 
 void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
+	cout<<"-- Apertura de archivos de comandas por dia --"<<endl;
 	ComandaHistorica ch;
 	Mozo m;
 	Comanda c;
@@ -167,7 +171,7 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 	}
 	int leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
 	while(leido==1){
-		char fechaGuia[11]; // Se crea cada archivo de las comandas por día
+		char fechaGuia[11]; // Se crea cada archivo de las comandas por dia
 		strcpy(fechaGuia,ch.fecha);
 		char archivoActual[24]="comandas_";
 		strcat(archivoActual,fechaGuia);
@@ -194,6 +198,7 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 		}
 		fclose(comandas);
 	}
+	cout<<"Archivos creados con exito."<<endl;
 	fclose(mozos);
 	fclose(archivo);
 }
@@ -231,6 +236,7 @@ void ordenamientoPorCodigo(const char* nombreArchivo){
 }
 
 void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2){
+	cout<<"-- Actualizacion de stock --"<<endl;
 	ComandaHistorica ch;
 	Producto p;
 	FILE*archivo=fopen(nombreArchivo1,"rb");
@@ -257,6 +263,7 @@ void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2
 		}
 		leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
 	}
+	cout<<"Actualizacion de stock exitosa."<<endl;
 	fclose(inventario);
 	fclose(archivo);
 }
