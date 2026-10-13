@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int MAX_DIAS = 7; // tope de dias por semana
+const int MAX_DIAS_SEMANA = 7; // tope de dias por semana
 
 // registro de venta, igual al usado por ventas.cpp
 struct Comanda {
@@ -14,11 +14,17 @@ struct Comanda {
     float comision;
 };
 
-// cantidad de dias que tiene un mes (considera bisiesto simple)
-int diasDelMes(int mes, int anio) {
+// cantidad de dias que tiene un mes
+// simplificacion: no se consideran anios bisiestos, febrero siempre tiene 28 dias
+int diasDelMes(int mes) {
     int dias[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     return dias[mes - 1];
     }
+
+// semana 1 = dias 1 a 7 del mes, semana 2 = dias 8 a 14, y asi.
+// si al mes le sobran dias, forman una semana mas corta (semana entera igual,solo que con menos dias)
+
+//devuelve false si esa semana no existe en el mes.
 
 bool calcularSemana(int mes, int semana, int &diaInicio, int &cantDias) {
     int totalDias = diasDelMes(mes);
@@ -37,7 +43,7 @@ bool calcularSemana(int mes, int semana, int &diaInicio, int &cantDias) {
     return true;
 }
  
-// Ej: valor = 6, cifras = 2 -> "06"g
+// Ej: valor = 6, cifras = 2 -> "06"
 void numeroATexto(char destino[], int valor, int cifras) {
     for (int i = cifras - 1; i >= 0; i--) {
         destino[i] = '0' + valor % 10;   // ultima cifra como caracter
@@ -207,7 +213,7 @@ int main() {
         return 1;
     }
  
-    int total = apareo(dias, actual, hay, cantDias, salida);
+    int total = aparear(dias, actual, hay, cantDias, salida);
  
     cerrarPlanillas(dias, cantDias);
     fclose(salida);
