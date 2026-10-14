@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <iomanip>
 
 using namespace std;
 
@@ -180,7 +181,7 @@ void imprimirResumen(const char nombreArchivo[]) {
     int cantidadMozo = 0;
     float comisionMozo = 0.0f;
 
-    cout << "ID Mozo Cantidad Comision" << endl;
+    cout << setw(10) << "Mozo" << setw(14) << "Cantidad" << setw(14) << "Comision" << endl;
     cout << "--------------------------------------" << endl;
 
     while (leerComanda(archivo, comanda)) {
@@ -189,7 +190,7 @@ void imprimirResumen(const char nombreArchivo[]) {
         }
 
         if (mozoActual != comanda.idMozo) {
-            cout << mozoActual << " " << cantidadMozo << " " << comisionMozo << endl;
+            cout << setw(10) << mozoActual << setw(14) << cantidadMozo << setw(14) << comisionMozo << endl;
 
             cantidadMozo = 0;
             comisionMozo = 0.0f;
@@ -202,7 +203,7 @@ void imprimirResumen(const char nombreArchivo[]) {
     }
 
     if (mozoActual != -1) {
-        cout << mozoActual << " " << cantidadMozo << " " << comisionMozo << endl;
+        cout << setw(10) << mozoActual << setw(14) << cantidadMozo << setw(14) << comisionMozo << endl;
     }
 
     fclose(archivo);
