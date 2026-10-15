@@ -195,6 +195,9 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 					break;
 				}
 			}
+			if(c.idMozo==0){
+				cout<<"No se encontro al mozo responsable de la comanda del producto de codigo "<<c.codigoProducto<<" de cantidad "<<c.cantidad<<" y comision $"<<c.comision<<". Revisar comanda."<<endl;
+			}
 			fseek(mozos,0,SEEK_SET);
 			fwrite(&c,sizeof(Comanda),1,comandas);
 			leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
