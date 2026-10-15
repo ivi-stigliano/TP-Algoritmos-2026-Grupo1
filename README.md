@@ -31,7 +31,7 @@ unidad de **archivos binarios en C/C++**.
 - normalizacion.cpp: Para realizar la lista de mozos, las comandas por dia y la actualización de stock, la clave es ordenar comandas_historicas.dat mediante un criterio adecuado (para mozos por su nombre, para comandas por día la fecha de la comanda y para actualiazación de stock por codigo de producto). 
 - ventas.cpp:
 - cierre.cpp: Junta las planillas diarias de ventas de una semana del mes en una única planilla semanal, con los registros ordenados por mozo (idMozo). La clave es que según el año, mes y semana que elija el usuario va a dar como salida un archivo binario comandas_semana_sX-mm.dat, con todos los registros de esos días ordenados por mozo.
-- resumen.cpp:
+- resumen.cpp:genera el resumen mensual de cantidades y comisiones por mozo. Unifica los archivos semanales en comandas.dat, los ordena por ID de mozo mediante selección y mediante corte de control  acumula los totales de cada mozo y del buffet. También valida el mes ingresado y contempla archivos semanales faltantes.
 
 La consigna completa está en **`enunciado.pdf`**. Leela antes de arrancar: el
 cliente (Alberto) cuenta su problema a su manera y ustedes tienen que descubrir
