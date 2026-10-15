@@ -4,6 +4,8 @@
 
 using namespace std;
 
+const double TASA_COMISION = 0.10;
+
 struct Comanda {
     int idMozo;
     int codigoProducto;
@@ -176,11 +178,12 @@ void imprimirResumen(const char nombreArchivo[]) {
     }
 
     Comanda comanda;
-    float totalBuffet = 0.0f;
+    double totalBuffet = 0.0;
     int mozoActual = -1;
     int cantidadMozo = 0;
     float comisionMozo = 0.0f;
 
+    cout << fixed << setprecision(2);
     cout << setw(10) << "Mozo" << setw(14) << "Cantidad" << setw(14) << "Comision" << endl;
     cout << "--------------------------------------" << endl;
 
@@ -199,7 +202,7 @@ void imprimirResumen(const char nombreArchivo[]) {
 
         cantidadMozo += comanda.cantidad;
         comisionMozo += comanda.comision;
-        totalBuffet += comanda.comision;
+        totalBuffet += comanda.comision / TASA_COMISION;
     }
 
     if (mozoActual != -1) {
@@ -209,7 +212,7 @@ void imprimirResumen(const char nombreArchivo[]) {
     fclose(archivo);
 
     cout << "--------------------------------------" << endl;
-    cout << "Total del buffet: " << totalBuffet << endl;
+    cout << "Total vendido por el buffet: $" << totalBuffet << endl;
 }
 
 int main() {
