@@ -3,9 +3,14 @@
 Trabajo Práctico grupal de **Algoritmos y Estructuras de Datos** (UTN FRBA) —
 unidad de **archivos binarios en C/C++**.
 
-> **Grupo:** 1
-> **Integrantes:** 
-Jano Manuel - jmanuel-frba || Thiago Nuñez - nunezthiago77-prog || Mariano Nicolás Romero - marianoromero75 || Franco Santomil - frsantomil-oss || Iván Nicolas Stigliano - ivi-stigliano
+**Grupo:** 1
+
+**Integrantes:** 
+- Jano Manuel - jmanuel-frba
+- Thiago Nuñez - nunezthiago77-prog
+- Mariano Nicolás Romero - marianoromero75
+- Franco Santomil - frsantomil-oss
+- Iván Nicolas Stigliano - ivi-stigliano
 
 ## División de Tareas
 
