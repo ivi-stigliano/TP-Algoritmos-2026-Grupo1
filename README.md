@@ -5,32 +5,28 @@ unidad de **archivos binarios en C/C++**.
 
 > **Grupo:** 1
 > **Integrantes:** 
-Jano Manuel - jmanuel-frba
-Thiago Nuñez - nunezthiago77-prog
-Mariano Nicolás Romero - marianoromero75
-Franco Santomil - frsantomil-oss
-Iván Nicolas Stigliano - ivi-stigliano
+Jano Manuel - jmanuel-frba || Thiago Nuñez - nunezthiago77-prog || Mariano Nicolás Romero - marianoromero75 || Franco Santomil - frsantomil-oss || Iván Nicolas Stigliano - ivi-stigliano
 
 ## División de Tareas
 
--normalizacion.cpp: Thiago Nuñez e Iván Stigliano
--ventas.cpp: Jano Manuel
--cierre.cpp: Mariano Romero
--resumen.cpp: Franco Santomil
+- normalizacion.cpp: Thiago Nuñez e Iván Stigliano
+- ventas.cpp: Jano Manuel
+- cierre.cpp: Mariano Romero
+- resumen.cpp: Franco Santomil
 
 ## Orden de Ejecución
 
--normalizacion.cpp (respecto a comandas_historicas.dat inicializa lista de mozos, crea comandas por día y actualiza stock)
--ventas.cpp (carga ventas, las une a la planilla del dia y actualiza stock correspondiente)
--cierre.cpp (une todas las planillas diarias (las creadas en normalizacion y las creadas en ventas) en una semanal)
--resumen.cpp (de la planilla semanal muestra por pantalla total vendido y comisiones a pagar)
+- normalizacion.cpp (respecto a comandas_historicas.dat inicializa lista de mozos, crea comandas por día y actualiza stock)
+- ventas.cpp (carga ventas, las une a la planilla del dia y actualiza stock correspondiente)
+- cierre.cpp (une todas las planillas diarias (las creadas en normalizacion y las creadas en ventas) en una semanal)
+- resumen.cpp (de la planilla semanal muestra por pantalla total vendido y comisiones a pagar)
 
 ## Resolución de Partes Clave
 
--normalizacion.cpp: Para realizar la lista de mozos, las comandas por dia y la actualización de stock, la clave es ordenar comandas_historicas.dat mediante un criterio adecuado (para mozos por su nombre, para comandas por día la fecha de la comanda y para actualiazación de stock por codigo de producto). 
--ventas.cpp:
--cierre.cpp: Junta las planillas diarias de ventas de una semana del mes en una única planilla semanal, con los registros ordenados por mozo (idMozo). La clave es que según el año, mes y semana que elija el usuario va a dar como salida un archivo binario comandas_semana_sX-mm.dat, con todos los registros de esos días ordenados por mozo.
--resumen.cpp:
+- normalizacion.cpp: Para realizar la lista de mozos, las comandas por dia y la actualización de stock, la clave es ordenar comandas_historicas.dat mediante un criterio adecuado (para mozos por su nombre, para comandas por día la fecha de la comanda y para actualiazación de stock por codigo de producto). 
+- ventas.cpp:
+- cierre.cpp: Junta las planillas diarias de ventas de una semana del mes en una única planilla semanal, con los registros ordenados por mozo (idMozo). La clave es que según el año, mes y semana que elija el usuario va a dar como salida un archivo binario comandas_semana_sX-mm.dat, con todos los registros de esos días ordenados por mozo.
+- resumen.cpp:
 
 La consigna completa está en **`enunciado.pdf`**. Leela antes de arrancar: el
 cliente (Alberto) cuenta su problema a su manera y ustedes tienen que descubrir
