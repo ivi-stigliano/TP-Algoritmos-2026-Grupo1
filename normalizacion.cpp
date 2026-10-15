@@ -36,6 +36,7 @@ void ordenamientoPorMozo(const char* nombreArchivo);
 void listaDeMozos(const char* nombreArchivo);
 void ordenamientoPorFecha(const char* nombreArchivo);
 void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2);
+void ordenamientoPorMozoDelDia(const char* nombreArchivo);
 void ordenamientoPorCodigo(const char* nombreArchivo);
 void actualizacionDeStock(const char* nombreArchivo1, const char* nombreArchivo2);
 
@@ -178,6 +179,8 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 		strcat(archivoActual,".dat");
 		FILE*comandas=fopen(archivoActual,"wb");
 		if(comandas==NULL){
+			fclose(archivo);
+			fclose(mozos);
 			cout<<"No se pudo crear el archivo"<<endl;
 			return;
 		}
@@ -197,9 +200,42 @@ void comandasPorDia(const char* nombreArchivo1, const char* nombreArchivo2){
 			leido=fread(&ch,sizeof(ComandaHistorica),1,archivo);
 		}
 		fclose(comandas);
+		ordenamientoPorMozoDelDia(archivoActual);
 	}
 	cout<<"Archivos creados con exito."<<endl;
 	fclose(mozos);
+	fclose(archivo);
+}
+
+void ordenamientoPorMozoDelDia(const char* nombreArchivo){
+	int len=0;
+	Comanda c;
+	FILE*archivo=fopen(nombreArchivo,"rb+");
+	if(archivo==NULL){
+		cout<<"No se pudo abrir el archivo"<<endl;
+		return;
+	}
+	while(fread(&c,sizeof(Comanda),1,archivo)==1){
+		len++;
+	}
+	for(int i=0;i<(len-1);i++){
+		for(int j=0;j<(len-i-1);j++){
+		    Comanda c1, c2, temp;
+	    	fseek(archivo,j*sizeof(Comanda),SEEK_SET);
+            fread(&c1,sizeof(Comanda),1,archivo);
+            fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            fread(&c2,sizeof(Comanda),1,archivo);
+            if(c1.idMozo>c2.idMozo){
+                temp=c1;
+                c1=c2;
+        		c2=temp;
+            	fseek(archivo,j*sizeof(Comanda),SEEK_SET);
+            	fwrite(&c1,sizeof(Comanda),1,archivo);   
+            	fseek(archivo,(j+1)*sizeof(Comanda),SEEK_SET);
+            	fwrite(&c2,sizeof(Comanda),1,archivo);
+            }
+	    }
+	}
 	fclose(archivo);
 }
 
