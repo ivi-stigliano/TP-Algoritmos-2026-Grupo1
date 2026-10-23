@@ -226,7 +226,7 @@ void ordenamientoPorMozoDelDia(const char* nombreArchivo){
 		    Comanda c1, c2, temp;
 	    	fseek(archivo,j*sizeof(Comanda),SEEK_SET);
             fread(&c1,sizeof(Comanda),1,archivo);
-            fseek(archivo,(j+1)*sizeof(ComandaHistorica),SEEK_SET);
+            fseek(archivo,(j+1)*sizeof(Comanda),SEEK_SET);
             fread(&c2,sizeof(Comanda),1,archivo);
             if(c1.idMozo>c2.idMozo){
                 temp=c1;
